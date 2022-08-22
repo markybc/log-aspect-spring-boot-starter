@@ -1,5 +1,6 @@
 package com.common.log.controller.starter;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.ThreadContext;
@@ -56,9 +57,10 @@ public class ControllerLogAspect {
             String returnValue = null;
             if (obj != null) {
                 if (obj instanceof List) {
-                    returnValue = " size : " + JSONObject.parseArray(JSONObject.toJSONString(obj)).size();
+                    List list = (List) obj;
+                    returnValue = " size=" + list.size();
                 } else {
-                    returnValue = JSONObject.toJSONString(obj);
+                    returnValue = getJsonStringValue(JSONObject.toJSONString(obj));
                 }
             }
 
@@ -79,5 +81,27 @@ public class ControllerLogAspect {
 
     }
 
+
+    public  String getJsonStringValue(String str) {
+        String returnValue = str;
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(str);
+            extractedObj(jsonObject);
+            returnValue = jsonObject.toJSONString();
+        } catch (Exception e) {
+        }
+        return returnValue;
+    }
+
+    private static void extractedObj(JSONObject logObj) {
+        logObj.getInnerMap().forEach((s, o) -> {
+            if (o instanceof JSONObject){
+                extractedObj((JSONObject) o);
+            }else if (o instanceof JSONArray){
+                JSONArray array = (JSONArray) o;
+                logObj.put(s,"size="+array.size());
+            }
+        });
+    }
 }
 

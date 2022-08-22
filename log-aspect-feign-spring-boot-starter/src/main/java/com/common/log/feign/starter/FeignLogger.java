@@ -35,7 +35,7 @@ public class FeignLogger extends feign.Logger {
             String configKey, Level logLevel, Response response, long elapsedTime) throws IOException {
         Map<String, String> requestParams = logContext.get();
         logContext.remove();
-        JSONObject logResponseObj = new JSONObject();
+        String returnValue = "";
 
         // 返回参数
         if (response.body() != null && !(response.status() == 204 || response.status() == 205)) {
@@ -44,10 +44,7 @@ public class FeignLogger extends feign.Logger {
             if (bodyData.length > 0) {
                 String responseBody = decodeOrDefault(bodyData, UTF_8, "Binary data");
                 responseBody = responseBody.replaceAll("\\s*|\t|\r|\n", "");
-
-                logResponseObj = JSONObject.parseObject(responseBody);
-                extractedObj(logResponseObj);
-
+                returnValue = getJsonStringValue(JSONObject.toJSONString(responseBody));
             }
             response = response.toBuilder().body(bodyData).build();
         }
@@ -55,7 +52,7 @@ public class FeignLogger extends feign.Logger {
                 .append("URL:["+requestParams.get(PATH)).append("]")
                 .append(",RequestMethod:[").append(requestParams.get(METHOD)).append("]")
                 .append(",Args:").append(JSONObject.toJSONString(requestParams.get(REQUEST_BODY))).append("")
-                .append(",ReturnValue:[").append(logResponseObj.toJSONString()).append("]")
+                .append(",ReturnValue:[").append(returnValue).append("]")
                 .append(",Time:[").append(elapsedTime).append("ms]")
                 .append("}");
         log.info(builder.toString());
@@ -80,6 +77,17 @@ public class FeignLogger extends feign.Logger {
         if (log.isInfoEnabled()) {
             log.info(String.format(methodTag(configKey) + format, args));
         }
+    }
+
+    public  String getJsonStringValue(String str) {
+        String returnValue = str;
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(str);
+            extractedObj(jsonObject);
+            returnValue = jsonObject.toJSONString();
+        } catch (Exception e) {
+        }
+        return returnValue;
     }
 
     private static void extractedObj(JSONObject logObj) {
