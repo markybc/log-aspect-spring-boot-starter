@@ -48,7 +48,7 @@ public class FeignLogger extends feign.Logger {
             }
             response = response.toBuilder().body(bodyData).build();
         }
-        StringBuilder builder = new StringBuilder().append("====>>>> feign 调用 <<<==== {")
+        StringBuilder builder = new StringBuilder().append("====>>>> feign 调用 成功 <<<==== {")
                 .append("URL:["+requestParams.get(PATH)).append("]")
                 .append(",RequestMethod:[").append(requestParams.get(METHOD)).append("]")
                 .append(",Args:").append(JSONObject.toJSONString(requestParams.get(REQUEST_BODY))).append("")
@@ -60,13 +60,13 @@ public class FeignLogger extends feign.Logger {
     }
     protected IOException logIOException(String configKey, Level logLevel, IOException ioe, long elapsedTime) {
         Map<String, String> requestParams = logContext.get();
-        StringBuilder builder = new StringBuilder().append("====>>>> feign 调用 <<<==== {")
+        StringBuilder builder = new StringBuilder().append("====>>>> feign 调用 失败 <<<==== {")
                 .append("URL:["+requestParams.get(PATH)).append("]")
                 .append(",RequestMethod:[").append(requestParams.get(METHOD)).append("]")
                 .append(",Args:[").append(JSONObject.toJSONString(requestParams.get(REQUEST_BODY))).append("]")
                 .append(",Time:[").append(elapsedTime).append("ms]")
                 .append("}");
-        log.info(builder.toString());
+        log.error(builder.toString());
 
         logContext.remove();
         return ioe;
