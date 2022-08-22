@@ -9,7 +9,12 @@
 通过
 ``org.apache.logging.log4j.ThreadContext.put("logId",UUID)``把请求编号``logId``放到线程里面
 日志打印添加 ``%X{logId}``输出
-
+application.ym需要添加配置开启日志
+````
+logging:
+  level:
+    com.xx.blockchain.clients: debug
+````
 日志内容：
 ````
 2022-08-21 11:12:09.063 [http-nio-8092-exec-2] [INFO ] com.netflix.config.ChainedDynamicProperty 115 - 1cee0cf18bb3449cab1dda03ee5c2e87 Flipping property: xxx-portal.ribbon.ActiveConnectionsLimit to use NEXT property: niws.loadbalancer.availabilityFilteringRule.activeConnectionsLimit = 2147483647
